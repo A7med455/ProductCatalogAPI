@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Register the service: whenever something asks for IProductService, give it a ProductService
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddSingleton<IProductService, ProductService>();
 
 var app = builder.Build();
 
