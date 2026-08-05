@@ -38,7 +38,6 @@ namespace productCatalogAPI.Controllers
         [HttpPost]
         public ActionResult AddProduct(Product Product)
         {
-            var Stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 var product = ProductService.Create(Product);
@@ -51,22 +50,23 @@ namespace productCatalogAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            finally
-            {
-                Stopwatch.Stop();
-                Console.WriteLine($"AddProduct took {Stopwatch.ElapsedMilliseconds}ms");
-            }
             }
 
         [HttpDelete("{id}")]
         public ActionResult DeleteById(int id)
         {
-            var success = ProductService.Delete(id);
-            if(!success)
+            try
             {
-                return NotFound($"Product With ID {id} not found");
+                var success = ProductService.Delete(id);
+                if(!success)
+                {
+                    return NotFound($"Product With ID {id} not found");
+                }
+                return Ok($"Product with ID:{id} Deleted");
+            }catch(ArgumentException  ex)
+            {
+                return BadRequest(ex.Message);
             }
-            return Ok($"Product with ID:{id} Deleted");
         }
 
         [HttpPut("{id}")]
