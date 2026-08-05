@@ -17,6 +17,10 @@ namespace productCatalogAPI.Services
         public Product? GetById(int id)=>products.FirstOrDefault(p => p.Id == id);
         public Product? Create(Product product)
         {
+            if(product.Price < 0)
+            {
+                throw new ArgumentException("Price cannot be negative.");
+            }
             product.Id = products.Count > 0 ? products.Max(p => p.Id) + 1 : 1;
             products.Add(product);
             return product;
@@ -27,6 +31,10 @@ namespace productCatalogAPI.Services
             if(product == null)
             {
                 return false;
+            }
+            if(UpdatedProduct.Price < 0)
+            {
+                throw new ArgumentException("Price cannot be negative.");
             }
             product.Name = UpdatedProduct.Name;
             product.Description = UpdatedProduct.Description;
