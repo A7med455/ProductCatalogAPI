@@ -12,6 +12,8 @@ var app = builder.Build();
 //catches anything wrong after it in the pipeline
 app.Use(async(context,next)=>
 {
+    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
     try
     {
         await next.Invoke();
@@ -25,6 +27,11 @@ app.Use(async(context,next)=>
         // actually writes that friendly message into the response body sent back to the caller
         // await = don't freeze the server while this gets sent over the network
         await context.Response.WriteAsync("{\"error\": \"Something went wrong. Please try again later.\"}");
+    }
+    finally
+    {
+        stopwatch.Stop();
+        Console.WriteLine($"{context.Request.Method} {context.Request.Path} took {stopwatch.ElapsedMilliseconds}ms");
     }
 });
 // Wires up all your [HttpGet], [HttpPost], etc. routes from your controllers
