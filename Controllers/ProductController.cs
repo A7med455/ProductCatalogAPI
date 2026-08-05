@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using productCatalogAPI.Models;
 using productCatalogAPI.Services;
@@ -37,13 +38,25 @@ namespace productCatalogAPI.Controllers
         [HttpPost]
         public ActionResult AddProduct(Product Product)
         {
-            var product = ProductService.Create(Product);
-            if(product == null)
+            var Stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
             {
-                return BadRequest("Could not create product");
+                var product = ProductService.Create(Product);
+                if(product == null)
+                {
+                    return BadRequest("Could not create product");
+                }
+                return Ok($"Product With ID:{product.Id} Added");
+            }catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
-            return Ok($"Product With ID:{product.Id} Added");
-        }
+            finally
+            {
+                Stopwatch.Stop();
+                Console.WriteLine($"AddProduct took {Stopwatch.ElapsedMilliseconds}ms");
+            }
+            }
 
         [HttpDelete("{id}")]
         public ActionResult DeleteById(int id)
@@ -59,12 +72,18 @@ namespace productCatalogAPI.Controllers
         [HttpPut("{id}")]
         public ActionResult UpdateProduct(int id,Product product)
         {
-            var success = ProductService.Update(id,product);
-            if(!success)
+            try
             {
-                return NotFound($"Product With ID:{id} not found or cannot be updated");
+                var success = ProductService.Update(id,product);
+                if(!success)
+                {
+                    return NotFound($"Product With ID:{id} not found or cannot be updated");
+                }
+                return Ok($"Product With ID{id} Updated");
+            }catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
-            return Ok($"Product With ID{id} Updated");
         }
     }
 }
